@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../features/authSlice";
 import { RootState } from "../store";
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
 if (!baseUrl) {
   throw new Error("Environment variable NEXT_PUBLIC_BASE_URL is not set");

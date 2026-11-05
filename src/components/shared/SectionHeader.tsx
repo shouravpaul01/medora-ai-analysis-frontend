@@ -1,64 +1,120 @@
+import React, { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
-import { Heading } from "./typography";
 
-interface SectionHeaderProps {
-  badge?: string;
+export interface SectionHeaderProps {
+  // Eyebrow / Tagline
+  tagline?: ReactNode;
+  taglineClassName?: string;
+  badge?: ReactNode;
   badgeIcon?: ReactNode;
-  title: string;
+  badgeClassName?: string;
+
+  // Title
+  title: ReactNode;
   titleClassName?: string;
-  description?: string;
+  titleAs?: "h1" | "h2" | "h3";
+
+  // Description & Leads
+  highlightLead?: ReactNode;
+  highlightLeadClassName?: string;
+  description?: ReactNode;
+  descriptionClassName?: string;
+
+  // Layout & Theme
   align?: "left" | "center";
-  right?: ReactNode;
+  theme?: "light" | "dark";
   className?: string;
+  children?: ReactNode;
 }
 
 export default function SectionHeader({
+  tagline,
+  taglineClassName,
   badge,
   badgeIcon,
+  badgeClassName,
   title,
   titleClassName,
+  titleAs: TitleTag = "h2",
+  highlightLead,
+  highlightLeadClassName,
   description,
+  descriptionClassName,
   align = "left",
-  right,
+  theme = "light",
   className,
+  children,
 }: SectionHeaderProps) {
+  const isDark = theme === "dark";
+  const isCenter = align === "center";
+
+  const effectiveTagline = tagline || badge;
+
   return (
     <div
       className={cn(
-        "flex items-start justify-between gap-5",
-        align === "center" && "flex-col items-center text-center",
-        className,
+        "flex flex-col",
+        isCenter ? "items-center text-center mx-auto" : "items-start text-left",
+        className
       )}
     >
-      {/* Left / Center Content */}
-      <div
+      {/* 1. Tagline / Eyebrow */}
+      {effectiveTagline && (
+        <div
+          className={cn(
+            "inline-flex items-center gap-2 mb-2.5",
+            taglineClassName ||
+              badgeClassName ||
+              (isDark
+                ? "text-amber-400 font-semibold text-xs sm:text-sm tracking-wide uppercase"
+                : "text-primary font-semibold text-xs sm:text-sm tracking-wider uppercase")
+          )}
+        >
+          {badgeIcon}
+          <span>{effectiveTagline}</span>
+        </div>
+      )}
+
+      {/* 2. Main Title */}
+      <TitleTag
         className={cn(
-          "flex flex-col gap-1",
-          align === "center" && "items-center",
+          "font-bold tracking-tight",
+          isDark ? "text-white" : "text-slate-900",
+          titleClassName || "text-3xl sm:text-4xl lg:text-5xl"
         )}
       >
-        {badge && (
-          <div className="inline-flex items-center gap-2.5 text-base font-medium text-primary bg-primary/20 rounded-full px-3 py-2 w-fit">
-            {badgeIcon}
-            {badge}
-          </div>
-        )}
-        <Heading
-          size={"h2"}
-          className={cn("font-playfair max-w-3xl", titleClassName)}
-        >
-          {title}
-        </Heading>
-        {description && (
-          <p className="text-neutral-500  max-w-[550px] mt-2">{description}</p>
-        )}
-      </div>
+        {title}
+      </TitleTag>
 
-      {/* Right Content (optional) */}
-      {right && align !== "center" && (
-        <div className="flex items-center gap-2 shrink-0 mt-1">{right}</div>
+      {/* 3. Highlighted Lead Sentence (Optional) */}
+      {highlightLead && (
+        <p
+          className={cn(
+            "font-medium text-base sm:text-lg leading-relaxed mt-3.5",
+            isDark ? "text-white" : "text-slate-800",
+            highlightLeadClassName
+          )}
+        >
+          {highlightLead}
+        </p>
       )}
+
+      {/* 4. Subtitle / Description (Optional) */}
+      {description && (
+        <p
+          className={cn(
+            "text-sm sm:text-base leading-relaxed mt-2.5",
+            isDark ? "text-blue-100/80" : "text-slate-600",
+            isCenter && "max-w-3xl",
+            descriptionClassName
+          )}
+        >
+          {description}
+        </p>
+      )}
+
+      {/* 5. Extra Custom Content / Children */}
+      {children}
     </div>
   );
 }

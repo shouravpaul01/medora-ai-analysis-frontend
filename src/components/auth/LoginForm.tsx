@@ -1,31 +1,27 @@
 "use client";
 
+import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Mail, LockKeyhole, Eye, EyeOff, ArrowRight } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { FieldGroup, FieldSet, FieldSeparator } from "@/components/ui/field";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { FormInput } from "@/components/shared/form/FormInput";
+import { FormPasswordInput } from "@/components/shared/form/FormPasswordInput";
 import { loginSchema } from "@/validation/auth.validation";
-import { FormInput } from "../shared/form/FormInput";
-import { Separator } from "../ui/separator";
-import { GoogleIcon } from "../shared/Icon";
-import SocialAuth from "./SocialAuth";
+import z from "zod";
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
-  const params = useSearchParams();
-  const redirect = params.get("redirect");
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/dashboard";
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  
-
-  const methods = useForm({
+  const methods = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       identifier: "",
@@ -33,85 +29,62 @@ export default function LoginForm() {
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginFormData) => {
+    setIsLoading(true);
     try {
-     
-
-      toast.success("Login successful 🎉");
-      router.replace(redirect || "/");
+      toast.success("Welcome back! Login successful 🎉");
+      router.replace(redirect);
     } catch (error: any) {
-      const apiError = error?.data;
-
-      if (apiError?.error) {
-        Object.values(apiError.error).forEach((messages: any) => {
-          if (Array.isArray(messages)) {
-            messages.forEach((msg) => toast.error(msg));
-          }
-        });
-        return;
-      }
-
-      // ✅ fallback
-      toast.error(apiError?.message || "Login failed ❌");
+      toast.error(error?.message || "Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
-        <FieldSet>
-          <FieldGroup>
-            {/* Email */}
-            <FormInput
-              name="identifier"
-              label="Email"
-              type="email"
-              placeholder="you@example.com"
-              startIcon={{ icon: Mail }}
-            />
+      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-5 w-full">
+        {/* Email Field */}
+        <FormInput
+          name="identifier"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          placeholder="Enter your email"
+        />
 
-            {/* Password */}
-            <FormInput
-              name="password"
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              placeholder="Enter your password"
-              startIcon={{ icon: LockKeyhole }}
-              endIcon={{
-                icon: showPassword ? EyeOff : Eye,
-                onClick: () => setShowPassword((prev) => !prev),
-              }}
-            />
-          </FieldGroup>
+        {/* Password Field */}
+        <FormPasswordInput
+          name="password"
+          label="Password"
+          autoComplete="current-password"
+          placeholder="••••••••"
+          showLockIcon={false}
+        />
 
-          <FieldSeparator />
-        </FieldSet>
-
-        {/* Forgot password */}
+        {/* Forgot Password Link */}
         <div className="flex justify-end -mt-2">
           <Link
             href="/forgot-password"
-            className="text-sm text-primary hover:underline font-medium"
+            className="text-xs sm:text-sm font-medium text-primary hover:underline"
           >
-            Forgot password?
+            Forgot password
           </Link>
         </div>
 
-        {/* Submit */}
-        <Button type="submit" className="w-full h-12" >
-         Sign In <ArrowRight />
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm sm:text-base font-semibold shadow-sm transition-all cursor-pointer"
+        >
+          {isLoading ? "Signing in..." : "Sign in"}
         </Button>
 
-      
-        <SocialAuth/>
-
-        {/* Signup */}
-        <p className="text-center text-sm text-muted-foreground pt-1">
-          Don’t have an account?{" "}
-          <Link
-            href="/register"
-            className="text-primary font-semibold hover:underline"
-          >
+        {/* Sign Up Link */}
+        <p className="text-center text-sm text-gray-600 pt-2">
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="font-semibold text-primary hover:underline">
             Sign up
           </Link>
         </p>

@@ -14,7 +14,7 @@ type LogoProps = {
 
 export default function Logo({
   href = "/",
-  src="/logo.svg",
+  src = "/logo.png",
   className,
   width = 160,
   height = 60,
