@@ -13,10 +13,11 @@ import { cn } from "@/lib/utils";
 
 export interface AppTextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string;
+  label?: React.ReactNode;
   description?: string;
   error?: string;
   textareaClassName?: string;
+  required?: boolean;
 }
 
 export const AppTextarea = React.forwardRef<
@@ -35,6 +36,7 @@ export const AppTextarea = React.forwardRef<
       disabled = false,
       className,
       textareaClassName,
+      required,
       ...props
     },
     ref
@@ -43,7 +45,12 @@ export const AppTextarea = React.forwardRef<
 
     return (
       <Field className={className}>
-        {label && <FieldLabel htmlFor={textareaId}>{label}</FieldLabel>}
+        {label && (
+          <FieldLabel htmlFor={textareaId} className="text-xs sm:text-sm font-medium text-slate-700 flex items-center">
+            <span>{label}</span>
+            {required && <span className="text-rose-500 font-semibold ml-1">*</span>}
+          </FieldLabel>
+        )}
 
         <FieldContent>
           <Textarea

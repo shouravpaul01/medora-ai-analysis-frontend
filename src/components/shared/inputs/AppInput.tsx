@@ -23,13 +23,14 @@ export type IconConfig = {
 
 export interface AppInputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> {
-  label?: string;
+  label?: React.ReactNode;
   description?: string;
   error?: string;
   startIcon?: IconConfig;
   endIcon?: IconConfig;
   inputClassName?: string;
   containerClassName?: string;
+  required?: boolean;
 }
 
 export const AppInput = React.forwardRef<HTMLInputElement, AppInputProps>(
@@ -48,6 +49,7 @@ export const AppInput = React.forwardRef<HTMLInputElement, AppInputProps>(
       containerClassName,
       startIcon,
       endIcon,
+      required,
       ...props
     },
     ref
@@ -81,7 +83,12 @@ export const AppInput = React.forwardRef<HTMLInputElement, AppInputProps>(
 
     return (
       <Field className={className}>
-        {label && <FieldLabel htmlFor={inputId}>{label}</FieldLabel>}
+        {label && (
+          <FieldLabel htmlFor={inputId} className="text-xs sm:text-sm font-medium text-slate-700 flex items-center">
+            <span>{label}</span>
+            {required && <span className="text-rose-500 font-semibold ml-1">*</span>}
+          </FieldLabel>
+        )}
 
         <InputGroup className={cn("h-11 bg-white", containerClassName)}>
           {renderIcon(startIcon, "inline-start")}
