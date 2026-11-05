@@ -8,9 +8,7 @@ type NavLinkProps = {
   href: string;
   label: string;
   exact?: boolean;
-
-  // customizable styles
- className?: string;
+  className?: string;
   activeClassName?: string;
   inactiveClassName?: string;
   showUnderline?: boolean;
@@ -22,32 +20,31 @@ export default function NavLink({
   label,
   exact = true,
   className,
-  activeClassName = "text-primary",
-  inactiveClassName = "text-neutral-800 hover:text-primary",
+  activeClassName = "text-slate-900 font-semibold",
+  inactiveClassName = "text-slate-600 hover:text-slate-900 font-medium",
   showUnderline = true,
   underlineClassName = "bg-primary",
 }: NavLinkProps) {
   const pathname = usePathname();
 
-  const isActive = exact
-    ? pathname === href
-    : pathname.startsWith(href);
+  // Handle anchor links or route matching
+  const isActive = exact ? pathname === href : pathname.startsWith(href);
 
   return (
     <Link
       href={href}
       className={cn(
-        "block w-full relative px-3 py-2 text-sm  font-medium transition",
-        isActive ? activeClassName : inactiveClassName,className
+        "relative px-3.5 py-2 text-sm sm:text-[15px] transition-colors inline-flex flex-col items-center",
+        isActive ? activeClassName : inactiveClassName,
+        className
       )}
     >
-      {label}
+      <span>{label}</span>
 
-      {/*  Underline optional */}
       {isActive && showUnderline && (
         <span
           className={cn(
-            "absolute -bottom-6 left-1/2 -translate-x-1/2 w-3/4 h-0.5",
+            "absolute bottom-0 left-3.5 right-3.5 h-[2.5px] rounded-full",
             underlineClassName
           )}
         />
