@@ -1,145 +1,123 @@
 "use client";
 
-import { useState } from "react";
-import { useForm, FormProvider, Controller } from "react-hook-form";
+import React, { useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, ArrowRight, LockKeyhole, Mail, User } from "lucide-react";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-
-import { Button } from "@/components/ui/button";
-
-import { registerSchema } from "@/validation/auth.validation";
-import { useRegisterUserMutation } from "@/redux/api/authApi";
 import Link from "next/link";
-import TermsDialog from "./TermsDialog";
-import { Checkbox } from "../ui/checkbox";
-import { FormInput } from "../shared/form/FormInput";
-import SocialAuth from "./SocialAuth";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { FormInput } from "@/components/shared/form/FormInput";
+import { FormPasswordInput } from "@/components/shared/form/FormPasswordInput";
+import { FormSelect } from "@/components/shared/form/FormSelect";
+import { signUpSchema } from "@/validation/auth.validation";
+import z from "zod";
+
+type SignUpFormData = z.infer<typeof signUpSchema>;
+
+const clinicOptions = [
+  { label: "Choose clinic", value: "" },
+  { label: "CorVera Main Clinic", value: "corvera-main" },
+  { label: "Metro Health Center", value: "metro-health" },
+  { label: "City Cardiology Clinic", value: "city-cardio" },
+  { label: "Valley Medical Group", value: "valley-medical" },
+  { label: "Other Healthcare Partner", value: "other" },
+];
 
 export default function RegisterForm() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [openTerms, setOpenTerms] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  const methods = useForm({
-    resolver: zodResolver(registerSchema),
+  const methods = useForm<SignUpFormData>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
-      full_name: "",
+      firstName: "",
+      lastName: "",
       email: "",
-
+      organization: "",
       password: "",
-      confirm_password: "",
-      isAgree: false,
     },
   });
 
-  const { handleSubmit, reset, control, setValue } = methods;
-
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: SignUpFormData) => {
+    setIsLoading(true);
     try {
-      toast.success("Registration successful 🎉");
-      router.push(`/login`);
-      reset();
+      toast.success("Account created successfully 🎉");
+      router.push("/login");
     } catch (error: any) {
-      toast.error(error?.data?.message || "Something went wrong ❌");
+      toast.error(error?.message || "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        {/* NAME */}
-        <FormInput
-          name="full_name"
-          label="Full Name"
-          placeholder="Enter your name"
-          startIcon={{ icon: User }}
-        />
-
-        {/* EMAIL */}
-        <FormInput
-          name="email"
-          label="Email"
-          placeholder="you@example.com"
-          startIcon={{ icon: Mail }}
-        />
-
-        {/* PASSWORD */}
-        <FormInput
-          name="password"
-          label="Password"
-          placeholder="Enter your password"
-          type={showPassword ? "text" : "password"}
-          startIcon={{ icon: LockKeyhole }}
-          endIcon={{
-            icon: showPassword ? EyeOff : Eye,
-            onClick: () => setShowPassword((p) => !p),
-          }}
-        />
-
-        {/* CONFIRM PASSWORD */}
-        <FormInput
-          name="confirm_password"
-          label="Confirm Password"
-          placeholder="Confirm password"
-          type={showConfirm ? "text" : "password"}
-          startIcon={{ icon: LockKeyhole }}
-          endIcon={{
-            icon: showConfirm ? EyeOff : Eye,
-            onClick: () => setShowConfirm((p) => !p),
-          }}
-        />
-        <div className="flex items-center gap-2">
-          <Controller
-            name="isAgree"
-            control={methods.control}
-            render={({ field }) => (
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={(val) => field.onChange(val)}
-              />
-            )}
+      <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-4 w-full">
+        {/* First Name & Last Name */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormInput
+            name="firstName"
+            label="First Name*"
+            placeholder="Enter first name"
           />
 
-          <p className="text-sm text-muted-foreground">
-            I agree to{" "}
-            <span
-              onClick={() => setOpenTerms(true)}
-              className="text-primary underline cursor-pointer"
-            >
-              Terms & Conditions
-            </span>
+          <FormInput
+            name="lastName"
+            label="Last Name*"
+            placeholder="Enter last name"
+          />
+        </div>
+
+        {/* Email */}
+        <FormInput
+          name="email"
+          label="Email*"
+          type="email"
+          autoComplete="email"
+          placeholder="Enter your email"
+        />
+
+        {/* Organization */}
+        <FormSelect
+          name="organization"
+          label="Organization*"
+          placeholder="Choose clinic"
+          options={clinicOptions.filter((opt) => opt.value !== "")}
+        />
+
+        {/* Password */}
+        <div>
+          <FormPasswordInput
+            name="password"
+            label="Password*"
+            autoComplete="new-password"
+            placeholder="••••••••••"
+            showLockIcon={false}
+          />
+          {/* Red helper text matching design */}
+          <p className="text-xs text-red-500 font-normal leading-relaxed pt-1.5">
+            **Must be at least 8 characters, uppercase, lowercase, number & special character.
           </p>
         </div>
 
-        {methods.formState.errors.isAgree && (
-          <p className="text-xs text-red-500">
-            {methods.formState.errors.isAgree.message as string}
-          </p>
-        )}
-        {/* SUBMIT */}
-        <Button type="submit" className="w-full h-12">
-          Sign Up <ArrowRight />
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="w-full h-11 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm sm:text-base font-semibold shadow-sm transition-all mt-3 cursor-pointer"
+        >
+          {isLoading ? "Creating account..." : "Get started"}
         </Button>
-        <SocialAuth />
-        {/* LOGIN LINK */}
-        <p className="text-center text-sm text-muted-foreground">
+
+        {/* Log in link */}
+        <p className="text-center text-sm text-gray-600 pt-1">
           Already have an account?{" "}
-          <Link href="/login" className="text-primary font-semibold">
-            Sign In
+          <Link href="/login" className="font-semibold text-primary hover:underline">
+            Log in
           </Link>
         </p>
       </form>
-      {/* TERMS DIALOG */}{" "}
-      <TermsDialog
-        open={openTerms}
-        onOpenChange={setOpenTerms}
-        control={control}
-        setValue={setValue}
-      />
     </FormProvider>
   );
 }

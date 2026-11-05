@@ -2,38 +2,32 @@ import z from "zod";
 
 export const loginSchema = z.object({
   identifier: z.string().nonempty("Email is required").email("Invalid email"),
-
   password: z
     .string()
     .nonempty("Password is required")
     .min(6, "Password must be at least 6 characters"),
 });
 
+export const signUpSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  organization: z.string().min(1, "Please select an organization"),
+  password: z
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Must include at least one uppercase letter")
+    .regex(/[a-z]/, "Must include at least one lowercase letter")
+    .regex(/[0-9]/, "Must include at least one number")
+    .regex(/[^A-Za-z0-9]/, "Must include at least one special character"),
+});
 
+// Legacy export compatibility
+export const registerSchema = signUpSchema;
 
-export const registerSchema = z.object({
-  full_name: z.string().min(2, "Full name is required"),
-  email: z.string().email("Invalid email"),
-
-  category: z.string().min(1, "Category is required"),
-
-  image: z.array(z.string()).min(1, "Profile image is required"),
-  licence_image: z.array(z.string()).optional(),
-  id_image: z.array(z.string()).min(1, "ID image is required"),
-  id_with_image: z.array(z.string()).min(1, "ID with image is required"),
-
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirm_password: z.string().nonempty("Confirm password is required."),
-    isAgree: z.boolean(),
-}).refine((data) => data.password === data.confirm_password, {
-  message: "Passwords do not match",
-  path: ["confirm_password"],
-}).refine((data) => data.isAgree === true, {
-    message: "You must accept Terms & Conditions",
-    path: ["isAgree"],
-  });
-
-
+export const forgotPasswordSchema = z.object({
+  email: z.string().nonempty("Email is required").email("Invalid email address"),
+});
 
 export const otpSchema = z.object({
   otp: z.string().length(6, "OTP must be 6 digits"),
@@ -41,10 +35,16 @@ export const otpSchema = z.object({
 
 export const resetPasswordSchema = z
   .object({
-    password: z.string().nonempty("Password is required").min(6, "Password must be at least 6 characters"),
-    confirm: z.string().nonempty("Confirm password is required"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must include uppercase letter")
+      .regex(/[a-z]/, "Must include lowercase letter")
+      .regex(/[0-9]/, "Must include number")
+      .regex(/[^A-Za-z0-9]/, "Must include special character"),
+    confirmPassword: z.string().nonempty("Please confirm your password"),
   })
-  .refine((data) => data.password === data.confirm, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["confirm"],
+    path: ["confirmPassword"],
   });
