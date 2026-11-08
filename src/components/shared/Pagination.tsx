@@ -1,5 +1,9 @@
 "use client";
 
+import React from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
   Pagination as ShadcnPagination,
   PaginationContent,
@@ -9,7 +13,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
 import {
   Select,
   SelectContent,
@@ -18,23 +21,95 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface PaginationProps {
+export interface PaginationProps {
   currentPage: number;
   totalPages: number;
   totalData?: number;
-  limit: number;
-  onLimitChange: (limit: number) => void;
+  itemsPerPage?: number;
+  startIndex?: number;
   onPageChange: (page: number) => void;
+  // Optional for limit selection
+  limit?: number;
+  onLimitChange?: (limit: number) => void;
+  variant?: "dashboard" | "full";
+  className?: string;
+  showShowingText?: boolean;
 }
 
-export default function Pagination({
+export function Pagination({
   currentPage,
   totalPages,
   totalData,
+  itemsPerPage,
+  startIndex,
+  onPageChange,
   limit,
   onLimitChange,
-  onPageChange,
+  variant = "dashboard",
+  className,
+  showShowingText = true,
 }: PaginationProps) {
+  const pageSize = itemsPerPage || limit || 10;
+  const calculatedStart =
+    startIndex !== undefined ? startIndex : (currentPage - 1) * pageSize;
+  const from = totalData === 0 ? 0 : calculatedStart + 1;
+  const to =
+    totalData !== undefined
+      ? Math.min(calculatedStart + pageSize, totalData)
+      : 0;
+
+  if (variant === "dashboard") {
+    return (
+      <div
+        className={cn(
+          "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-5 mt-2 border-t border-slate-100 text-xs text-slate-500",
+          className
+        )}
+      >
+        {/* Left: Showing entries count */}
+        {showShowingText && totalData !== undefined && (
+          <p>
+            {totalData === 0
+              ? "Showing 0 of 0"
+              : `Showing ${from}-${to} of ${totalData}`}
+          </p>
+        )}
+
+        {/* Right: Page controls */}
+        <div className="flex items-center gap-3 self-end sm:self-auto ml-auto sm:ml-0">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            disabled={currentPage <= 1}
+            onClick={() => onPageChange(Math.max(1, currentPage - 1))}
+            className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+            aria-label="Previous Page"
+          >
+            <ArrowLeft className="size-3.5" />
+          </Button>
+
+          <span className="font-medium text-slate-700 select-none">
+            Page {currentPage} of {Math.max(1, totalPages)}
+          </span>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            disabled={currentPage >= totalPages}
+            onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
+            className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
+            aria-label="Next Page"
+          >
+            <ArrowRight className="size-3.5" />
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // "full" variant with page numbers and optional limit dropdown
   const getPageNumbers = () => {
     const pages: (number | "ellipsis")[] = [];
 
@@ -66,44 +141,38 @@ export default function Pagination({
     return pages;
   };
 
-  if (totalPages <= 1 && !totalData) return null;
-
-  const from = totalData ? (currentPage - 1) * limit + 1 : 0;
-  const to = totalData
-    ? Math.min(currentPage * limit, totalData)
-    : 0;
-
   return (
-    <div className="mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div
+      className={cn(
+        "mt-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between",
+        className
+      )}
+    >
       {/* Left */}
-      <div className="flex  items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">
-            Show
-          </span>
+      <div className="flex items-center gap-4">
+        {onLimitChange && limit && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Show</span>
 
-          <Select
-            value={String(limit)}
-            onValueChange={(value) =>
-              onLimitChange(Number(value))
-            }
-          >
-            <SelectTrigger className="w-24">
-              <SelectValue />
-            </SelectTrigger>
+            <Select
+              value={String(limit)}
+              onValueChange={(value) => onLimitChange(Number(value))}
+            >
+              <SelectTrigger className="w-24">
+                <SelectValue />
+              </SelectTrigger>
 
-            <SelectContent>
-              <SelectItem value="10">10</SelectItem>
-              <SelectItem value="20">20</SelectItem>
-              <SelectItem value="50">50</SelectItem>
-              <SelectItem value="100">100</SelectItem>
-            </SelectContent>
-          </Select>
+              <SelectContent>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+                <SelectItem value="100">100</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <span className="text-sm text-muted-foreground">
-            entries
-          </span>
-        </div>
+            <span className="text-sm text-muted-foreground">entries</span>
+          </div>
+        )}
 
         {totalData !== undefined && (
           <p className="hidden md:block whitespace-nowrap text-sm text-muted-foreground">
@@ -121,13 +190,13 @@ export default function Pagination({
             <PaginationItem>
               <PaginationPrevious
                 onClick={() =>
-                  currentPage > 1 &&
-                  onPageChange(currentPage - 1)
+                  currentPage > 1 && onPageChange(currentPage - 1)
                 }
-                className={`transition-all h-10 ${currentPage === 1
-                  ? "pointer-events-none opacity-40"
-                  : "cursor-pointer border bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                  }`}
+                className={`transition-all h-10 ${
+                  currentPage === 1
+                    ? "pointer-events-none opacity-40"
+                    : "cursor-pointer border bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                }`}
               />
             </PaginationItem>
 
@@ -142,10 +211,11 @@ export default function Pagination({
                   <PaginationLink
                     isActive={currentPage === page}
                     onClick={() => onPageChange(page)}
-                    className={`cursor-pointer transition-all h-10 ${currentPage === page
-                      ? "border bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                      : "hover:bg-primary/10"
-                      }`}
+                    className={`cursor-pointer transition-all h-10 ${
+                      currentPage === page
+                        ? "border bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                        : "hover:bg-primary/10"
+                    }`}
                   >
                     {page}
                   </PaginationLink>
@@ -157,13 +227,13 @@ export default function Pagination({
             <PaginationItem>
               <PaginationNext
                 onClick={() =>
-                  currentPage < totalPages &&
-                  onPageChange(currentPage + 1)
+                  currentPage < totalPages && onPageChange(currentPage + 1)
                 }
-                className={`transition-all h-10 ${currentPage === totalPages
-                  ? "pointer-events-none opacity-40"
-                  : "cursor-pointer border bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
-                  }`}
+                className={`transition-all h-10 ${
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-40"
+                    : "cursor-pointer border bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground"
+                }`}
               />
             </PaginationItem>
           </PaginationContent>
@@ -172,3 +242,5 @@ export default function Pagination({
     </div>
   );
 }
+
+export default Pagination;

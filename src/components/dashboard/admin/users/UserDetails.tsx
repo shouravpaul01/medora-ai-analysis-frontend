@@ -2,11 +2,12 @@
 
 import React, { useMemo } from "react";
 import Link from "next/link";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { initialAdminUsers, type AdminUserItem } from "./types";
 import { cn } from "@/lib/utils";
 
@@ -25,35 +26,20 @@ export function UserDetails({ userId = "1" }: UserDetailsProps) {
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 pb-12">
-      {/* Back to Users Link */}
-      <div>
-        <Link
-          href="/admin/users"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          <span>Back to Users</span>
-        </Link>
-      </div>
-
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-            {user.name}
-          </h2>
-          <p className="text-slate-500 text-sm sm:text-base">
-            User account details
-          </p>
-        </div>
-
-        <Link href={`/admin/users/${user.id}/edit`}>
-          <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
-            <Pencil className="size-4" />
-            <span>Edit User</span>
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        backLink={{ href: "/admin/users", label: "Back to Users" }}
+        title={user.name}
+        description="User account details"
+        action={
+          <Link href={`/admin/users/${user.id}/edit`}>
+            <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
+              <Pencil className="size-4" />
+              <span>Edit User</span>
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Main Details Card */}
       <Card className="border-slate-100 bg-white shadow-xs rounded-2xl py-0 overflow-hidden">

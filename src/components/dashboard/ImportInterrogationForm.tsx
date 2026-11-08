@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/shared/form/FormInput";
+import { PageHeader } from "@/components/shared/PageHeader";
 import PdfDropzone from "./PdfDropzone";
 import {
   importInterrogationSchema,
@@ -78,15 +79,10 @@ export default function ImportInterrogationForm() {
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 pb-12">
       {/* Page Title & Subtitle */}
-      <div>
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          Import Interrogation
-        </h2>
-        <p className="text-slate-500 text-sm sm:text-base mt-1.5">
-          Enter basic patient information and upload an interrogation document for
-          processing.
-        </p>
-      </div>
+      <PageHeader
+        title="Import Interrogation"
+        description="Enter basic patient information and upload an interrogation document for processing."
+      />
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

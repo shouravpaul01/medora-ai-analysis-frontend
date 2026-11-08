@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Eye, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Pencil } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Pagination } from "@/components/shared/Pagination";
 import { sampleUsers, type UserItem } from "./types";
 
 export function RecentUsersTable() {
@@ -149,43 +150,13 @@ export function RecentUsersTable() {
         </Table>
 
         {/* Table Footer & Pagination Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-5 mt-2 border-t border-slate-100 text-xs text-slate-500">
-          <p>
-            Showing {startIndex + 1}–
-            {Math.min(startIndex + itemsPerPage, sampleUsers.length)} of{" "}
-            {sampleUsers.length}
-          </p>
-
-          <div className="flex items-center gap-3 self-end sm:self-auto">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-              aria-label="Previous Page"
-            >
-              <ChevronLeft className="size-4" />
-            </Button>
-
-            <span className="font-medium text-slate-700">
-              Page {currentPage} of {totalPages}
-            </span>
-
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-              aria-label="Next Page"
-            >
-              <ChevronRight className="size-4" />
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalData={sampleUsers.length}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+        />
       </CardContent>
     </Card>
   );

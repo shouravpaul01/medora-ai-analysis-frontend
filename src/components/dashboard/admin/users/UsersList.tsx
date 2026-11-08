@@ -7,8 +7,6 @@ import {
   Search,
   Eye,
   Pencil,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import {
   Card,
@@ -28,6 +26,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Pagination } from "@/components/shared/Pagination";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { initialAdminUsers, type AdminUserItem } from "./types";
 
 export function UsersList() {
@@ -59,23 +59,18 @@ export function UsersList() {
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-12">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-            Users
-          </h2>
-          <p className="text-slate-500 text-sm sm:text-base">
-            Manage your users and their roles
-          </p>
-        </div>
-
-        <Link href="/admin/users/create">
-          <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
-            <UserPlus className="size-4" />
-            <span>Create New User</span>
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        title="Users"
+        description="Manage your users and their roles"
+        action={
+          <Link href="/admin/users/create">
+            <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
+              <UserPlus className="size-4" />
+              <span>Create New User</span>
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Main Table Card */}
       <Card className="border-slate-100 bg-white shadow-xs rounded-2xl py-0 overflow-hidden">
@@ -210,44 +205,13 @@ export function UsersList() {
           </Table>
 
           {/* Table Footer & Pagination */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-5 mt-2 border-t border-slate-100 text-xs text-slate-500">
-            <p>
-              Showing{" "}
-              {filteredUsers.length === 0 ? 0 : startIndex + 1}–
-              {Math.min(startIndex + itemsPerPage, filteredUsers.length)} of{" "}
-              {filteredUsers.length}
-            </p>
-
-            <div className="flex items-center gap-3 self-end sm:self-auto">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-                aria-label="Previous Page"
-              >
-                <ChevronLeft className="size-4" />
-              </Button>
-
-              <span className="font-medium text-slate-700">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-                aria-label="Next Page"
-              >
-                <ChevronRight className="size-4" />
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalData={filteredUsers.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
         </CardContent>
       </Card>
     </div>

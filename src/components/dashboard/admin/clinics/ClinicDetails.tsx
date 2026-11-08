@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   Pencil,
   FileText,
   User,
@@ -13,8 +12,6 @@ import {
   ChevronDown,
   FileSpreadsheet,
   ArrowDown,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
@@ -35,6 +32,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Pagination } from "@/components/shared/Pagination";
+import { PageHeader } from "@/components/shared/PageHeader";
 import {
   sampleProcessedReports,
   initialClinics,
@@ -112,35 +111,23 @@ export function ClinicDetails({ clinicId = "1" }: ClinicDetailsProps) {
 
   return (
     <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-12">
-      {/* Back to Device Clinics Link */}
-      <div>
-        <Link
-          href="/admin/clinics"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          <span>Back to Device Clinics</span>
-        </Link>
-      </div>
-
       {/* Page Header with Edit Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-            {clinic.name}
-          </h2>
-          <p className="text-slate-500 text-sm sm:text-base">
-            Device Clinic account details and successfully processed reports
-          </p>
-        </div>
-
-        <Link href={`/admin/clinics/${clinic.id}/edit`}>
-          <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
-            <Pencil className="size-4" />
-            <span>Edit Device Clinic</span>
-          </Button>
-        </Link>
-      </div>
+      <PageHeader
+        backLink={{
+          href: "/admin/clinics",
+          label: "Back to Device Clinics",
+        }}
+        title={clinic.name}
+        description="Device Clinic account details and successfully processed reports"
+        action={
+          <Link href={`/admin/clinics/${clinic.id}/edit`}>
+            <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
+              <Pencil className="size-4" />
+              <span>Edit Device Clinic</span>
+            </Button>
+          </Link>
+        }
+      />
 
       {/* =========================================================================
           Top 3 Metric / Stat Cards
@@ -412,44 +399,13 @@ export function ClinicDetails({ clinicId = "1" }: ClinicDetailsProps) {
           </Table>
 
           {/* Table Footer & Pagination */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-5 mt-2 border-t border-slate-100 text-xs text-slate-500">
-            <p>
-              Showing{" "}
-              {filteredReports.length === 0 ? 0 : startIndex + 1}–
-              {Math.min(startIndex + itemsPerPage, filteredReports.length)} of{" "}
-              {filteredReports.length}
-            </p>
-
-            <div className="flex items-center gap-3 self-end sm:self-auto">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-                aria-label="Previous Page"
-              >
-                <ChevronLeft className="size-4" />
-              </Button>
-
-              <span className="font-medium text-slate-700">
-                Page {currentPage} of {totalPages}
-              </span>
-
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                className="size-8 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 cursor-pointer"
-                aria-label="Next Page"
-              >
-                <ChevronRight className="size-4" />
-              </Button>
-            </div>
-          </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalData={filteredReports.length}
+            itemsPerPage={itemsPerPage}
+            onPageChange={setCurrentPage}
+          />
         </CardContent>
       </Card>
     </div>

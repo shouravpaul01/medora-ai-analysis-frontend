@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeft, User, Check, Loader2 } from "lucide-react";
+import { User, Check, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { FormInput } from "@/components/shared/form/FormInput";
 import { FormPasswordInput } from "@/components/shared/form/FormPasswordInput";
 import { FormSelect } from "@/components/shared/form/FormSelect";
@@ -102,28 +103,15 @@ export function UserForm({ userId, mode }: UserFormProps) {
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 pb-12">
-      {/* Back to Users Link */}
-      <div>
-        <Link
-          href={backHref}
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          <span>Back to Users</span>
-        </Link>
-      </div>
-
-      {/* Page Title */}
-      <div className="flex flex-col gap-1">
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          {isEdit ? "Edit User" : "Add New User"}
-        </h2>
-        <p className="text-slate-500 text-sm sm:text-base">
-          {isEdit
+      <PageHeader
+        backLink={{ href: backHref, label: "Back to Users" }}
+        title={isEdit ? "Edit User" : "Add New User"}
+        description={
+          isEdit
             ? "Update the user's account details"
-            : "Create a new user account"}
-        </p>
-      </div>
+            : "Create a new user account"
+        }
+      />
 
       <FormProvider {...methods}>
         <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">

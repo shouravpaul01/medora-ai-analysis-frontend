@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ArrowLeft,
   Building2,
   FileText,
   Sparkles,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/shared/PageHeader";
 import { FormInput } from "@/components/shared/form/FormInput";
 import { FormSelect } from "@/components/shared/form/FormSelect";
 import { Textarea } from "@/components/ui/textarea";
@@ -83,26 +83,14 @@ export function EditClinicForm({ clinicId = "1" }: EditClinicFormProps) {
 
   return (
     <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 pb-12">
-      {/* Back to Device Clinics Link */}
-      <div>
-        <Link
-          href={`/admin/clinics/${clinicId}`}
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-        >
-          <ArrowLeft className="size-4" />
-          <span>Back to Device Clinics</span>
-        </Link>
-      </div>
-
-      {/* Page Title */}
-      <div className="flex flex-col gap-1">
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-          Edit Device Clinic
-        </h2>
-        <p className="text-slate-500 text-sm sm:text-base">
-          Update the Device Clinic account information.
-        </p>
-      </div>
+      <PageHeader
+        backLink={{
+          href: `/admin/clinics/${clinicId}`,
+          label: "Back to Device Clinics",
+        }}
+        title="Edit Device Clinic"
+        description="Update the Device Clinic account information."
+      />
 
       {/* =========================================================================
           Card 1: Device Clinic information
