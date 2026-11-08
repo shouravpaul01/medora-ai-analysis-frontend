@@ -4,7 +4,6 @@ import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
   Plus,
-  Search,
   Building2,
   Eye,
   Pencil,
@@ -27,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Pagination } from "@/components/shared/Pagination";
 import { PageHeader } from "@/components/shared/PageHeader";
+import SearchInput from "@/components/shared/SearchInput";
 import { initialClinics, type ClinicItem } from "./types";
 
 export function ClinicsList() {
@@ -76,17 +76,15 @@ export function ClinicsList() {
       <Card className="border-slate-100 bg-white shadow-xs rounded-2xl py-0 overflow-hidden">
         {/* Search Input Bar */}
         <CardHeader className="p-6 pb-2">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-            <input
-              type="text"
+          <div className="w-full max-w-md">
+            <SearchInput
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
+              onChange={(val) => {
+                setSearchQuery(val);
                 setCurrentPage(1);
               }}
               placeholder="Search device clinics by name, administrator, or date created..."
-              className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="h-10 rounded-xl border-slate-200"
             />
           </div>
         </CardHeader>

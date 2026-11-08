@@ -7,7 +7,6 @@ import {
   FileText,
   User,
   Building2,
-  Search,
   Download,
   ChevronDown,
   FileSpreadsheet,
@@ -34,6 +33,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Pagination } from "@/components/shared/Pagination";
 import { PageHeader } from "@/components/shared/PageHeader";
+import SearchInput from "@/components/shared/SearchInput";
 import {
   sampleProcessedReports,
   initialClinics,
@@ -292,17 +292,15 @@ export function ClinicDetails({ clinicId = "1" }: ClinicDetailsProps) {
           </div>
 
           {/* Search Bar */}
-          <div className="relative w-full">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
-            <input
-              type="text"
+          <div className="w-full">
+            <SearchInput
               value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
+              onChange={(val) => {
+                setSearchQuery(val);
                 setCurrentPage(1);
               }}
               placeholder="Search by patient name, date of birth, user name, or date created..."
-              className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="h-10 rounded-xl border-slate-200"
             />
           </div>
         </CardHeader>
