@@ -44,7 +44,7 @@ export function AddClinicForm() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 pb-12">
+    <div className="w-full flex flex-col gap-6 pb-12">
       <PageHeader
         backLink={{
           href: "/admin/clinics",
@@ -108,7 +108,7 @@ export function AddClinicForm() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-11 px-6 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                className="h-11 px-6"
               >
                 {isSubmitting ? (
                   <>

@@ -162,7 +162,7 @@ export function UserPersonalInformationCard({
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="h-10 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer"
+                className="h-10 px-5"
               >
                 {isSubmitting ? (
                   <>

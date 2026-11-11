@@ -25,7 +25,7 @@ export function UserDetails({ userId = "1" }: UserDetailsProps) {
   const isAdmin = user.role === "Admin";
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 pb-12">
+    <div className="w-full flex flex-col gap-6 pb-12">
       {/* Page Header */}
       <PageHeader
         backLink={{ href: "/admin/users", label: "Back to Users" }}
@@ -33,7 +33,7 @@ export function UserDetails({ userId = "1" }: UserDetailsProps) {
         description="User account details"
         action={
           <Link href={`/admin/users/${user.id}/edit`}>
-            <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
+            <Button className="h-11 px-5">
               <Pencil className="size-4" />
               <span>Edit User</span>
             </Button>

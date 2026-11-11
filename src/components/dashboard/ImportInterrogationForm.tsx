@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   User,
@@ -11,10 +11,21 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Field,
+  FieldLabel,
+  FieldContent,
+  FieldDescription,
+} from "@/components/ui/field";
 import { FormInput } from "@/components/shared/form/FormInput";
+import { FormDatePicker } from "@/components/shared/form/FormDatePicker";
 import { PageHeader } from "@/components/shared/PageHeader";
 import PdfDropzone from "./PdfDropzone";
+import { AnalysisResultsView } from "./analysis-results/AnalysisResultsView";
+import type { ReviewData } from "./analysis-results/types";
 import {
   importInterrogationSchema,
   type ImportInterrogationFormData,
@@ -24,6 +35,7 @@ import { cn } from "@/lib/utils";
 export default function ImportInterrogationForm() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reviewData, setReviewData] = useState<ReviewData | null>(null);
 
   const methods = useForm<ImportInterrogationFormData>({
     resolver: zodResolver(importInterrogationSchema),
@@ -44,7 +56,6 @@ export default function ImportInterrogationForm() {
     formState: { isValid },
   } = methods;
 
-  const currentDocType = watch("documentType");
   const firstName = watch("firstName");
   const lastName = watch("lastName");
   const dateOfBirth = watch("dateOfBirth");
@@ -62,13 +73,24 @@ export default function ImportInterrogationForm() {
     setIsSubmitting(true);
     try {
       // Simulate document upload & AI extraction
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 900));
       toast.success(
-        `Interrogation document "${selectedFile.name}" uploaded successfully! Processing started.`
+        `Interrogation document "${selectedFile.name}" processed successfully!`
       );
-      // Reset form and file
-      reset();
-      setSelectedFile(null);
+
+      const initials = `${data.firstName?.[0] || ""}${data.lastName?.[0] || ""}`.toUpperCase();
+      const formattedDob =
+        data.dateOfBirth instanceof Date
+          ? format(data.dateOfBirth, "MM/dd/yyyy")
+          : String(data.dateOfBirth);
+
+      setReviewData({
+        patientName: `${data.firstName} ${data.lastName}`.trim(),
+        patientInitials: initials || "PT",
+        dateOfBirth: formattedDob,
+        documentType: data.documentType,
+        file: selectedFile,
+      });
     } catch {
       toast.error("Failed to upload interrogation document. Please try again.");
     } finally {
@@ -76,8 +98,17 @@ export default function ImportInterrogationForm() {
     }
   };
 
+  if (reviewData) {
+    return (
+      <AnalysisResultsView
+        data={reviewData}
+        onCloseReview={() => setReviewData(null)}
+      />
+    );
+  }
+
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6 pb-12">
+    <div className="w-full space-y-6 pb-12">
       {/* Page Title & Subtitle */}
       <PageHeader
         title="Import Interrogation"
@@ -121,11 +152,11 @@ export default function ImportInterrogationForm() {
                 containerClassName="h-11 rounded-xl border-slate-200"
               />
 
-              <FormInput
+              <FormDatePicker
                 name="dateOfBirth"
                 label="Date of Birth"
                 placeholder="MM/DD/YYYY"
-                containerClassName="h-11 rounded-xl border-slate-200"
+                triggerClassName="h-11 rounded-xl border-slate-200"
               />
             </div>
           </div>
@@ -150,65 +181,73 @@ export default function ImportInterrogationForm() {
             </div>
 
             {/* Document Type Selector */}
-            <div className="space-y-2.5 mb-6">
-              <label className="text-xs sm:text-sm font-semibold text-slate-700">
+            <Field className="space-y-2.5 mb-6">
+              <FieldLabel className="text-xs sm:text-sm font-semibold text-slate-700">
                 Document Type
-              </label>
+              </FieldLabel>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md">
-                {/* Option 1: Clinic */}
-                <button
-                  type="button"
-                  onClick={() => setValue("documentType", "clinic")}
-                  className={cn(
-                    "flex items-start gap-3 rounded-xl p-3.5 text-left transition-all cursor-pointer",
-                    currentDocType === "clinic"
-                      ? "border-2 border-primary bg-blue-50/40 ring-1 ring-primary/20"
-                      : "border border-slate-200 bg-white hover:border-slate-300"
-                  )}
-                >
-                  <div className="mt-0.5 flex size-4.5 items-center justify-center rounded-full border border-slate-300">
-                    {currentDocType === "clinic" && (
-                      <div className="size-2.5 rounded-full bg-primary" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">
-                      Clinic
-                    </p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      In-clinic interrogation
-                    </p>
-                  </div>
-                </button>
+              <Controller
+                name="documentType"
+                control={methods.control}
+                render={({ field }) => (
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md"
+                  >
+                    {/* Option 1: Clinic */}
+                    <FieldLabel
+                      htmlFor="doc-type-clinic"
+                      className={cn(
+                        "flex w-full items-start gap-3 rounded-xl p-3.5 border transition-all cursor-pointer font-normal select-none",
+                        field.value === "clinic"
+                          ? "border-2 border-primary bg-blue-50/40 ring-1 ring-primary/20"
+                          : "border border-slate-200 bg-white hover:border-slate-300"
+                      )}
+                    >
+                      <RadioGroupItem
+                        value="clinic"
+                        id="doc-type-clinic"
+                        className="mt-0.5"
+                      />
+                      <FieldContent>
+                        <span className="text-sm font-semibold text-slate-900 cursor-pointer">
+                          Clinic
+                        </span>
+                        <FieldDescription className="text-xs text-slate-500 mt-0.5">
+                          In-clinic interrogation
+                        </FieldDescription>
+                      </FieldContent>
+                    </FieldLabel>
 
-                {/* Option 2: Remote */}
-                <button
-                  type="button"
-                  onClick={() => setValue("documentType", "remote")}
-                  className={cn(
-                    "flex items-start gap-3 rounded-xl p-3.5 text-left transition-all cursor-pointer",
-                    currentDocType === "remote"
-                      ? "border-2 border-primary bg-blue-50/40 ring-1 ring-primary/20"
-                      : "border border-slate-200 bg-white hover:border-slate-300"
-                  )}
-                >
-                  <div className="mt-0.5 flex size-4.5 items-center justify-center rounded-full border border-slate-300">
-                    {currentDocType === "remote" && (
-                      <div className="size-2.5 rounded-full bg-primary" />
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">
-                      Remote
-                    </p>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Remote transmission
-                    </p>
-                  </div>
-                </button>
-              </div>
-            </div>
+                    {/* Option 2: Remote */}
+                    <FieldLabel
+                      htmlFor="doc-type-remote"
+                      className={cn(
+                        "flex w-full items-start gap-3 rounded-xl p-3.5 border transition-all cursor-pointer font-normal select-none",
+                        field.value === "remote"
+                          ? "border-2 border-primary bg-blue-50/40 ring-1 ring-primary/20"
+                          : "border border-slate-200 bg-white hover:border-slate-300"
+                      )}
+                    >
+                      <RadioGroupItem
+                        value="remote"
+                        id="doc-type-remote"
+                        className="mt-0.5"
+                      />
+                      <FieldContent>
+                        <span className="text-sm font-semibold text-slate-900 cursor-pointer">
+                          Remote
+                        </span>
+                        <FieldDescription className="text-xs text-slate-500 mt-0.5">
+                          Remote transmission
+                        </FieldDescription>
+                      </FieldContent>
+                    </FieldLabel>
+                  </RadioGroup>
+                )}
+              />
+            </Field>
 
             {/* PDF Document Upload Area */}
             <div className="space-y-2.5">
@@ -237,12 +276,7 @@ export default function ImportInterrogationForm() {
             <Button
               type="submit"
               disabled={!isFormReady || isSubmitting}
-              className={cn(
-                "h-12 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer",
-                isFormReady
-                  ? "bg-primary hover:bg-[#123258] text-white shadow-xs"
-                  : "bg-slate-300 text-white cursor-not-allowed hover:bg-slate-300"
-              )}
+              className="h-12 px-6"
             >
               {isSubmitting ? (
                 <>

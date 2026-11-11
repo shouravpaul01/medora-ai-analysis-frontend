@@ -29,6 +29,8 @@ export interface AppDatePickerProps {
   value?: Date | string | null;
   onChange?: (date: Date | undefined) => void;
   className?: string;
+  triggerClassName?: string;
+  formatPattern?: string;
 }
 
 export function AppDatePicker({
@@ -42,6 +44,8 @@ export function AppDatePicker({
   value,
   onChange,
   className,
+  triggerClassName,
+  formatPattern = "MM/dd/yyyy",
 }: AppDatePickerProps) {
   const [open, setOpen] = useState(false);
 
@@ -60,12 +64,13 @@ export function AppDatePicker({
             variant="outline"
             disabled={disabled}
             className={cn(
-              "w-full justify-between text-left font-normal h-12 bg-white",
-              !validDate && "text-muted-foreground"
+              "w-full justify-between text-left font-normal h-11 rounded-xl border-slate-200 bg-white",
+              triggerClassName,
+              !validDate && "text-muted-foreground",
             )}
           >
             <span>
-              {validDate ? format(validDate, "PPP") : placeholder}
+              {validDate ? format(validDate, formatPattern) : placeholder}
             </span>
 
             <CalendarIcon className="w-4 h-4 text-muted-foreground" />
@@ -80,6 +85,7 @@ export function AppDatePicker({
               onChange?.(date);
               setOpen(false);
             }}
+            captionLayout="dropdown"
           />
         </PopoverContent>
       </Popover>

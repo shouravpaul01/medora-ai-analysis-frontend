@@ -57,14 +57,14 @@ export function UsersList() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-12">
+    <div className="w-full flex flex-col gap-6 pb-12">
       {/* Page Header */}
       <PageHeader
         title="Users"
         description="Manage your users and their roles"
         action={
           <Link href="/admin/users/create">
-            <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
+            <Button className="h-11 px-5">
               <UserPlus className="size-4" />
               <span>Create New User</span>
             </Button>

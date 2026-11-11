@@ -110,7 +110,7 @@ export function ClinicDetails({ clinicId = "1" }: ClinicDetailsProps) {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-12">
+    <div className="w-full flex flex-col gap-6 pb-12">
       {/* Page Header with Edit Button */}
       <PageHeader
         backLink={{
@@ -121,7 +121,7 @@ export function ClinicDetails({ clinicId = "1" }: ClinicDetailsProps) {
         description="Device Clinic account details and successfully processed reports"
         action={
           <Link href={`/admin/clinics/${clinic.id}/edit`}>
-            <Button className="h-11 px-5 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 shadow-xs transition-all cursor-pointer">
+            <Button className="h-11 px-5">
               <Pencil className="size-4" />
               <span>Edit Device Clinic</span>
             </Button>
@@ -223,7 +223,7 @@ export function ClinicDetails({ clinicId = "1" }: ClinicDetailsProps) {
                 <DropdownMenuTrigger asChild>
                   <Button
                     size="sm"
-                    className="h-10 px-4 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 cursor-pointer shadow-xs"
+                    className="h-10 px-4"
                   >
                     <Download className="size-4" />
                     <span>Export Selected</span>
@@ -264,7 +264,7 @@ export function ClinicDetails({ clinicId = "1" }: ClinicDetailsProps) {
                 <DropdownMenuTrigger asChild>
                   <Button
                     size="sm"
-                    className="h-10 px-4 rounded-xl bg-primary hover:bg-[#123258] text-white font-semibold flex items-center gap-2 cursor-pointer shadow-xs"
+                    className="h-10 px-4"
                   >
                     <Download className="size-4" />
                     <span>Download</span>

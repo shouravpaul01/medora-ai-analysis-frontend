@@ -19,7 +19,7 @@ export function AdminSettingsView() {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col gap-6 pb-12">
+    <div className="w-full flex flex-col gap-6 pb-12">
       {/* Page Header */}
       <PageHeader
         title="Admin Settings"

@@ -145,11 +145,7 @@ export function UserSecurityCard({ isDefaultOpen = false }: UserSecurityCardProp
                 <Button
                   type="submit"
                   disabled={!isFormValid || isSubmitting}
-                  className={`h-10 px-6 rounded-xl font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-                    isFormValid
-                      ? "bg-primary hover:bg-[#123258] text-white shadow-xs"
-                      : "bg-[#94A3B8] text-white opacity-80 cursor-not-allowed"
-                  }`}
+                  className="h-10 px-6"
                 >
                   {isSubmitting ? (
                     <>

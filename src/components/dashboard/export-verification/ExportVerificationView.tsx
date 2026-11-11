@@ -95,7 +95,7 @@ export function ExportVerificationView() {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto flex flex-col gap-6 pb-12">
+    <div className="w-full flex flex-col gap-6 pb-12">
       {/* Page Title */}
       <PageHeader title="Export Verification" />
 
