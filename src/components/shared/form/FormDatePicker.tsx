@@ -7,8 +7,10 @@ import {
   AppDatePickerProps,
 } from "@/components/shared/inputs/AppDatePicker";
 
-export interface FormDatePickerProps
-  extends Omit<AppDatePickerProps, "value" | "onChange" | "error"> {
+export interface FormDatePickerProps extends Omit<
+  AppDatePickerProps,
+  "value" | "onChange" | "error"
+> {
   name: string;
 }
 
@@ -19,6 +21,8 @@ export function FormDatePicker({
   disabled = false,
   placeholder = "Pick a date",
   className,
+  triggerClassName,
+  formatPattern,
 }: FormDatePickerProps) {
   const formContext = useFormContext();
 
@@ -32,6 +36,8 @@ export function FormDatePicker({
         disabled={disabled}
         placeholder={placeholder}
         className={className}
+        triggerClassName={triggerClassName}
+        formatPattern={formatPattern}
       />
     );
   }
@@ -53,6 +59,8 @@ export function FormDatePicker({
       disabled={disabled}
       placeholder={placeholder}
       className={className}
+      triggerClassName={triggerClassName}
+      formatPattern={formatPattern}
       value={value}
       onChange={(date) =>
         setValue(name, date, {

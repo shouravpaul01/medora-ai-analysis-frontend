@@ -69,15 +69,17 @@ export function AppSelect({
           </SelectTrigger>
 
           <SelectContent>
-            {options.map((option) => (
-              <SelectItem
-                key={option.value}
-                value={option.value}
-                className="p-2"
-              >
-                {option.label}
-              </SelectItem>
-            ))}
+            {options
+              .filter((option) => Boolean(option.value && option.value.trim()))
+              .map((option) => (
+                <SelectItem
+                  key={option.value}
+                  value={option.value}
+                  className="p-2 cursor-pointer"
+                >
+                  {option.label}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </FieldContent>
